@@ -4,17 +4,6 @@ import { Repository } from 'typeorm';
 import { User } from './user.entity';
 
 @Injectable()
-
-
-type some = {
-  label: ''
-  count: ''
-}[]
-
-type some1 = {
-  label: string
-}[]
-
 export class UsersService {
   constructor(@InjectRepository(User) private repo: Repository<User>) {
     this.repo = repo;
