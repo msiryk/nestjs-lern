@@ -9,6 +9,8 @@ import { Report } from './reports/report.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Book } from './books/book.entity';
 import { BooksModule } from './books/books.module';
+import { AuthorModule } from './author/author.module';
+import { Author } from './author/author.entity';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const cookieSession = require('cookie-session');
 
@@ -24,7 +26,7 @@ const cookieSession = require('cookie-session');
         return {
           type: 'sqlite',
           database: config.get<string>('DB_NAME'),
-          entities: [User, Report, Book],
+          entities: [User, Report, Book, Author],
           synchronize: true,
         };
       },
@@ -32,6 +34,7 @@ const cookieSession = require('cookie-session');
     UsersModule,
     ReportsModule,
     BooksModule,
+    AuthorModule,
   ],
   controllers: [AppController],
   providers: [AppService],
