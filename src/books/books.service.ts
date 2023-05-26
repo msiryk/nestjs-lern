@@ -4,46 +4,59 @@ import { Repository } from 'typeorm';
 import { Book } from './book.entity';
 import { CreateBookDto } from './dtos/create-book.dto';
 import UpdateBookDto from './dtos/update-book.dto';
+import { Author } from 'src/author/author.entity';
 
 @Injectable()
 export class BooksService {
-  constructor(@InjectRepository(Book) private repo: Repository<Book>) {}
+  constructor(
+    @InjectRepository(Book) private bookRepo: Repository<Book>,
+    @InjectRepository(Author) private authorRepo: Repository<Author>,
+  ) {}
 
   findAll() {
-    return this.repo.find({
+    return this.bookRepo.find({
       order: {
         title: 'ASC',
       },
     });
   }
 
-  create(item: CreateBookDto) {
-    const book = this.repo.create(item);
+  async create(item: CreateBookDto) {
+    let author = item.author;
+    if (item.authorId) {
+      const authorItem = await this.authorRepo.findOneBy({ id: item.authorId });
+      if (!authorItem) {
+        throw new NotFoundException('Author is not found, wrong authorId');
+      }
+      author = authorItem.name;
+    }
 
-    return this.repo.save(book);
+    const book = this.bookRepo.create({ ...item, author });
+
+    return this.bookRepo.save(book);
   }
 
   async update(id: number, attrs: UpdateBookDto) {
-    const book = await this.repo.findOneBy({ id });
+    const book = await this.bookRepo.findOneBy({ id });
     if (!book) {
       throw new NotFoundException('Book is not found');
     }
 
     Object.assign(book, attrs);
-    return this.repo.save(book);
+    return this.bookRepo.save(book);
   }
 
   async remove(id: number) {
-    const book = await this.repo.findOneBy({ id });
+    const book = await this.bookRepo.findOneBy({ id });
     if (!book) {
       throw new NotFoundException('Book is not found');
     }
 
-    return this.repo.remove(book);
+    return this.bookRepo.remove(book);
   }
 
   async findOne(id: number) {
-    const book = await this.repo.findOneBy({ id });
+    const book = await this.bookRepo.findOneBy({ id });
     if (!book) {
       throw new NotFoundException('Book is not found');
     }
